@@ -1,6 +1,6 @@
 #ifndef INIT
 #define INIT
 
-void initMenu ();
+int initMenu ();
 
 #endif
