@@ -93,6 +93,31 @@ void refreshGameScreen (WINDOW *menuwin, int height, int width, question *round,
 	wrefresh(menuwin);
 }
 
+void printAnswCol (int keyInput, WINDOW *menuwin, int height, int width, question *round, Game *game, int col) {
+	wattron(menuwin, COLOR_PAIR(col));
+	wattron(menuwin, A_BOLD);
+	
+	switch (keyInput) {
+		case 'a':
+			mvwprintw(menuwin, height / 2 + 2, width / 5 - 2, "A) %s", round[game->quest].answ[0]);
+			break;
+		case 'b':
+			mvwprintw(menuwin, height / 2 + 2, width * 5 / 7 - 5, "B) %s", round[game->quest].answ[1]);
+			break;
+		case 'c':
+			mvwprintw(menuwin, height / 2 + 4, width / 5 - 2, "C) %s", round[game->quest].answ[2]);
+			break;
+		case 'd':
+			mvwprintw(menuwin, height / 2 + 4, width * 5 / 7 - 5, "D) %s", round[game->quest].answ[3]);
+			break;
+		default:
+			break;
+	}
+
+	wattroff(menuwin, COLOR_PAIR(col));
+	wattroff(menuwin, A_BOLD);
+}
+
 void startGame (char *qFileName, int height, int width, WINDOW *menuwin, Game *game) {
 	FILE *q_file = fopen (qFileName, "r");
 
@@ -162,43 +187,22 @@ void startGame (char *qFileName, int height, int width, WINDOW *menuwin, Game *g
 				game->score += 10;
 				game->rightAnsw++;
 				refreshGameScreen (menuwin, height, width, round, option, game, &curent, 2);
-				wattron(menuwin, COLOR_PAIR(2));
+				wattron(menuwin, A_BLINK);
+				printAnswCol (keyInput, menuwin, height, width, round, game, 2);
+				wattroff(menuwin, A_BLINK);					
 			} else {
 				game->score -= 5;
 				refreshGameScreen (menuwin, height, width, round, option, game, &curent, 3);
-				wattron(menuwin, COLOR_PAIR(3));
-			}
-
-			wattron(menuwin, A_BOLD);
-			wattron(menuwin, A_BLINK);
-
-			switch (keyInput) {
-				case 'a':
-					mvwprintw(menuwin, height / 2 + 2, width / 5 - 2, "A) %s", round[game->quest].answ[0]);
-					break;
-				case 'b':
-					mvwprintw(menuwin, height / 2 + 2, width * 5 / 7 - 5, "B) %s", round[game->quest].answ[1]);
-					break;
-				case 'c':
-					mvwprintw(menuwin, height / 2 + 4, width / 5 - 2, "C) %s", round[game->quest].answ[2]);
-					break;
-				case 'd':
-					mvwprintw(menuwin, height / 2 + 4, width * 5 / 7 - 5, "D) %s", round[game->quest].answ[3]);
-					break;
-				default:
-					break;
-			}
-			wattroff(menuwin, A_BOLD);
-			wattroff(menuwin, A_BLINK);
-
-			if (keyInput - 'a' == round[game->quest].corAnsw) {
-				wattroff(menuwin, COLOR_PAIR(2));
-			} else {
-				wattroff(menuwin, COLOR_PAIR(3));
+				
+				printAnswCol (keyInput, menuwin, height, width, round, game, 3);
+				
+				wattron(menuwin, A_BLINK);
+				printAnswCol (round[game->quest].corAnsw + 'a', menuwin, height, width, round, game, 2);		
+				wattroff(menuwin, A_BLINK);										
 			}
 
 			wrefresh(menuwin);
-			sleep(2.1);
+			sleep(2.5);
 
 			game->quest++;
 			wclear(menuwin);
