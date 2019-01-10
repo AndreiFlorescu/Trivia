@@ -12,6 +12,5 @@ int main (int argc, char ** argv) {
 
 	initMenu(argv[1]);
 
-
 	return 0;
 }

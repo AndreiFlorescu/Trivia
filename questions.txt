@@ -1,7 +1,37 @@
+5
+1. Care este cea mai mare cascada din Romania?
+Cascada Cailor
+Cascada Urlatoare
+Cascada Duruitoare
+Cascada Bigar
+0
+2. Ce fluviu trece prin Londra?
+Sena
+Ural
+Tamisa
+Rin
+2
+3. Care este cel mai vechi oras de pe teritoriul Romaniei?
+Alba Iulia
+Constanta
+Cluj-Napoca
+Sighisoara
 1
-1) Cine e cel mai tare?
-A) Eu
-B) EU scris cu litere mari
-C) eu scris mic
-D) eU scris aiurea
+4. Care este cel mai populat oras din lume?
+Seul
+Mexico City
+Delhi
+Tokyo
+3
+5. In ce an a ajuns primul om pe luna?
+1967
+1971
+1969
+1972
+2
+6. Intre ce ani a avut loc Razboil de Independenta al Romaniei
+1877-1878
+1875-1876
+1879-1880
+1873-1874
 0
