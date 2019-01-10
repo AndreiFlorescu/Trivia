@@ -1,7 +1,7 @@
 1
-Cine e cel mai tare?
-A) Andrei
-B) Alexandra
-C) Mama
-D) Tata
+1) Cine e cel mai tare?
+A) Eu
+B) EU scris cu litere mari
+C) eu scris mic
+D) eU scris aiurea
 0
