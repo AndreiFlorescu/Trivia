@@ -12,14 +12,30 @@ void printQuestion (int curQuest, int height, int width, WINDOW *menuwin, questi
 	mvwprintw(menuwin, height / 2 - 4, width / 2 - strlen(round[curQuest].quest) / 2 - 1, "%s", round[curQuest].quest);
 	wattroff(menuwin, A_BOLD);
 
-	if (round[curQuest].corAnsw == 0 || secChoice == 0 || secChoice == -1)
-		mvwprintw(menuwin, height / 2 + 2, width / 5 - 2, "A) %s", round[curQuest].answ[0]);
-	if (round[curQuest].corAnsw == 1 || secChoice == 1 || secChoice == -1)
-		mvwprintw(menuwin, height / 2 + 2, width * 5 / 7 - 5, "B) %s", round[curQuest].answ[1]);
-	if (round[curQuest].corAnsw == 2 || secChoice == 2 || secChoice == -1)
-		mvwprintw(menuwin, height / 2 + 4, width / 5 - 2, "C) %s", round[curQuest].answ[2]);
-	if (round[curQuest].corAnsw == 3 || secChoice == 3 || secChoice == -1)
-		mvwprintw(menuwin, height / 2 + 4, width * 5 / 7 - 5, "D) %s", round[curQuest].answ[3]);
+	if (round[curQuest].corAnsw == 0 || secChoice == 0 || secChoice == -1) {
+		wattron(menuwin, A_BOLD);
+		mvwprintw(menuwin, height / 2 + 2, width / 5 - 2, "A) ");
+		wattroff(menuwin, A_BOLD);
+		mvwprintw(menuwin, height / 2 + 2, width / 5 + 1, "%s", round[curQuest].answ[0]);
+	}
+	if (round[curQuest].corAnsw == 1 || secChoice == 1 || secChoice == -1) {
+		wattron(menuwin, A_BOLD);
+		mvwprintw(menuwin, height / 2 + 2, width * 5 / 7 - 5, "B) ");
+		wattroff(menuwin, A_BOLD);
+		mvwprintw(menuwin, height / 2 + 2, width * 5 / 7 - 2, "%s", round[curQuest].answ[1]);
+	}
+	if (round[curQuest].corAnsw == 2 || secChoice == 2 || secChoice == -1) {
+		wattron(menuwin, A_BOLD);
+		mvwprintw(menuwin, height / 2 + 4, width / 5 - 2, "C) ");
+		wattroff(menuwin, A_BOLD);
+		mvwprintw(menuwin, height / 2 + 4, width / 5 + 1, "%s", round[curQuest].answ[2]);
+	}
+	if (round[curQuest].corAnsw == 3 || secChoice == 3 || secChoice == -1) {
+		wattron(menuwin, A_BOLD);
+		mvwprintw(menuwin, height / 2 + 4, width * 5 / 7 - 5, "D) ");
+		wattroff(menuwin, A_BOLD);
+		mvwprintw(menuwin, height / 2 + 4, width * 5 / 7 - 2, "%s", round[curQuest].answ[3]);
+	}
 }
 
 void loadQuestion (int nr, question *round, FILE *q_file) {
@@ -51,25 +67,58 @@ void freeMem (question *round, int nr) {
 	free(round);
 }
 
-void refreshGameScreen (WINDOW *menuwin, int height, int width, question *round, char option[][10], Game *game, int *curent, int col) {
-	int i;
-
-	wclear(menuwin);
-	box(menuwin, 0, 0);
-		
-	// Printam scorul
-	mvwprintw(menuwin, height / 4, width * 4 / 5, "SCOR: ");
-	wattron(menuwin, COLOR_PAIR(col));
-	mvwprintw(menuwin, height / 4, width * 4 / 5 + 6, "%d", game->score);
-	wattroff(menuwin, COLOR_PAIR(col));
-	// Pritam timpul
+void printTime (WINDOW *menuwin, int height, int width) {
 	time_t mytime;
 	char *time_str;
 	mytime = time(NULL);
 	time_str = ctime(&mytime);
 	time_str[strlen(time_str) - 1] = '\0';
+
+	wattron(menuwin, COLOR_PAIR(5));
+	wattron(menuwin, A_BOLD);
 	mvwprintw(menuwin, 0, width - strlen(time_str) - 6, "[ %s ]", time_str);
-		
+	wattroff(menuwin, A_BOLD);
+	wattroff(menuwin, COLOR_PAIR(5));
+}
+
+void refreshGameScreen (WINDOW *menuwin, int height, int width, question *round, char *option[], Game *game, int *curent, int col) {
+	int i;
+
+	wclear(menuwin);
+
+	printBorder(menuwin);	
+
+	// Instructiuni de utilizare
+	wattron(menuwin, COLOR_PAIR(5));
+	for (i = 1; i < width - 1; ++i) {
+		mvwprintw(menuwin, height - 6, i, "-");
+	}
+	wattroff(menuwin, COLOR_PAIR(5));
+
+	mvwprintw(menuwin, height - 4, width / 2 - 37, "Pentru a selecta un raspuns apasati tasta a, b, c sau d");
+	mvwprintw(menuwin, height - 3, width / 2 - 37, "Pentru a selecta o varianta ajutatoare folositi sagetile si apasati ENTER");
+
+	// Printam scorul
+	if (game->score > 99 || game->score < -9) {
+		mvwprintw(menuwin, height / 4 - 4, width * 4 / 5 - 2, "+-----------+");
+		mvwprintw(menuwin, height / 4 - 3, width * 4 / 5 - 2, "|           |");
+		mvwprintw(menuwin, height / 4 - 2, width * 4 / 5 - 2, "+-----------+");
+
+	} else {
+		mvwprintw(menuwin, height / 4 - 4, width * 4 / 5 - 2, "+----------+");
+		mvwprintw(menuwin, height / 4 - 3, width * 4 / 5 - 2, "|          |");
+		mvwprintw(menuwin, height / 4 - 2, width * 4 / 5 - 2, "+----------+");
+	}
+	wattron(menuwin, A_BOLD);
+	mvwprintw(menuwin, height / 4 - 3, width * 4 / 5, "SCOR: ");
+	wattron(menuwin, COLOR_PAIR(col));
+	mvwprintw(menuwin, height / 4 - 3, width * 4 / 5 + 6, "%d", game->score);
+	wattroff(menuwin, COLOR_PAIR(col));
+	wattroff(menuwin, A_BOLD);
+
+	// Pritam timpul
+	printTime(menuwin, height, width);
+
 	if (game->help[0] == 1) {
 		*curent = 1;
 	}
@@ -78,6 +127,8 @@ void refreshGameScreen (WINDOW *menuwin, int height, int width, question *round,
 	}
 
 	// Printam optiunile
+	wattron(menuwin, A_BOLD);
+	wattron(menuwin, COLOR_PAIR(5));
 	for (i = 0; i < 2; ++i) {
 		if (i == *curent) {
 			wattron(menuwin, A_REVERSE);
@@ -87,6 +138,8 @@ void refreshGameScreen (WINDOW *menuwin, int height, int width, question *round,
 		}
 		wattroff(menuwin, A_REVERSE);
 	}
+	wattroff(menuwin, COLOR_PAIR(5));
+	wattroff(menuwin, A_BOLD);
 
 	printQuestion(game->quest, height, width, menuwin, round, game->fiftyVar);
 
@@ -121,19 +174,15 @@ void printAnswCol (int keyInput, WINDOW *menuwin, int height, int width, questio
 void startGame (char *qFileName, int height, int width, WINDOW *menuwin, Game *game) {
 	FILE *q_file = fopen (qFileName, "r");
 
-	time_t mytime;
-	char *time_str;
-
 	int nr;
 	fscanf (q_file, "%d\n", &nr);
 	question *round = malloc ((nr + 1) * sizeof(question));
 	loadQuestion(nr, round, q_file);
+	fclose(q_file);
 
 	wclear(menuwin);
 
-	char option[2][10];
-	strcpy(option[0], "[ 50/50 ]");
-	strcpy(option[1], "[ Skip ]");
+	char *option[] = {"[ 50/50 ]", "[ Skip ]"};
 
 	int curent = 0;
 	int keyInput;
@@ -161,11 +210,12 @@ void startGame (char *qFileName, int height, int width, WINDOW *menuwin, Game *g
 						while (game->fiftyVar == round[game->quest].corAnsw) {
 							game->fiftyVar = rand() % 4;
 						}
-					} else { 
+					} else {
+						game->fiftyVar = -1;
 						game->quest++;
 						wclear(menuwin);
 					}
-					game->help[curent] = 1;
+					game->help[curent] = game->quest + 1;
 				
 				default:
 					break;
@@ -191,6 +241,9 @@ void startGame (char *qFileName, int height, int width, WINDOW *menuwin, Game *g
 				printAnswCol (keyInput, menuwin, height, width, round, game, 2);
 				wattroff(menuwin, A_BLINK);					
 			} else {
+				if (game->help[0] == game->quest + 1 && keyInput - 'a' != game->fiftyVar) {
+					continue;
+				}
 				game->score -= 5;
 				refreshGameScreen (menuwin, height, width, round, option, game, &curent, 3);
 				
@@ -215,28 +268,38 @@ void startGame (char *qFileName, int height, int width, WINDOW *menuwin, Game *g
 	if (game->quest == nr) {
 		game->state = 0;
 		wclear(menuwin);
-		box(menuwin, 0, 0);	
-		mytime = time(NULL);
-		time_str = ctime(&mytime);
-		time_str[strlen(time_str) - 1] = '\0';
-		mvwprintw(menuwin, 0, width - strlen(time_str) - 6, "[ %s ]", time_str);
-		mvwprintw(menuwin, height / 2 - 3, width / 2 - 8, "Scor final: %d", game->score);
-		
+
+		printBorder(menuwin);
+
+		printTime(menuwin, height, width);
+
+		mvwprintw(menuwin, height / 2 - 3, width / 2 - 8, "Scor final: ", game->score);
+		wattron(menuwin, A_BOLD);
+		mvwprintw(menuwin, height / 2 - 3, width / 2 + 4, "%d", game->score);
+		wattroff(menuwin, A_BOLD);
+
 		mvwprintw(menuwin, height / 2 - 1, width / 2 - 11, "Raspunsuri corecte: ");
 		wattron(menuwin, COLOR_PAIR(2));
+		wattron(menuwin, A_BOLD);
 		mvwprintw(menuwin, height / 2 - 1, width / 2 + 9, "%d", game->rightAnsw);
 		wattroff(menuwin, COLOR_PAIR(2));
+		wattroff(menuwin, A_BOLD);
 
 		mvwprintw(menuwin, height / 2, width / 2 - 11, "Raspunsuri gresite: ");
 		wattron(menuwin, COLOR_PAIR(3));
-		mvwprintw(menuwin, height / 2, width / 2 + 9, "%d", nr - game->rightAnsw - game->help[1]);
+		wattron(menuwin, A_BOLD);
+		mvwprintw(menuwin, height / 2, width / 2 + 9, "%d", nr - game->rightAnsw - (game->help[1] == 0 ? 0 : 1));
 		wattroff(menuwin, COLOR_PAIR(3));
+		wattroff(menuwin, A_BOLD);
 
-		if (game->help[1] == 1) {
-			mvwprintw(menuwin, height / 2 + 1, width / 2 - 10, "Raspunsuri sarite: 1");
+		if (game->help[1] != 0) {
+			mvwprintw(menuwin, height / 2 + 1, width / 2 - 10, "Raspunsuri sarite: ");
+			wattron(menuwin, A_BOLD);
+			mvwprintw(menuwin, height / 2 + 1, width / 2 + 9, "1");
+			wattroff(menuwin, A_BOLD);
 		}
 
-		mvwprintw(menuwin, height / 2 + 5, width / 2 - 25, "Apasati orice tasta pentru a va intoarce in meniu");
+		mvwprintw(menuwin, height * 2 / 3, width / 2 - 25, "Apasati orice tasta pentru a va intoarce in meniu");
 		wgetch(menuwin);
 	}
 
@@ -246,18 +309,27 @@ void startGame (char *qFileName, int height, int width, WINDOW *menuwin, Game *g
 }
 
 void printTitle (WINDOW *menuwin, int height, int width) {
-	//start_color();
 	wattron(menuwin, COLOR_PAIR(1));
-	mvwprintw(menuwin, height - 3, width - 28, "By Andrei Florescu - 2019");
-	mvwprintw(menuwin, 2, width / 2 - 19, "_________   _________   _________");
-	mvwprintw(menuwin, 3, width / 2 - 20, "/\\   _____\\ /\\   _____\\ /\\   _____\\");
-	mvwprintw(menuwin, 4, width / 2 - 20, "\\ \\  \\____/ \\ \\  \\____/_\\ \\  \\____/");
-	mvwprintw(menuwin, 5, width / 2 - 19, "\\ \\  \\      \\ \\______  \\\\ \\  \\");
-	mvwprintw(menuwin, 6, width / 2 - 18, "\\ \\  \\______\\_ _____\\  \\\\ \\  \\______");
-	mvwprintw(menuwin, 7, width / 2 - 17, "\\ \\________\\ /\\________\\\\ \\________\\");
-	mvwprintw(menuwin, 8, width / 2 - 16, "\\/________/ \\/________/ \\/________/");
-	mvwprintw(menuwin, 11, width / 2 - 9, "Cine Stie Castiga!");
+	wattron(menuwin, A_BOLD);
+	mvwprintw(menuwin, height - 3, width - 28, "by Andrei Florescu - 2019");
+	mvwprintw(menuwin, height / 10, width / 2 - 19, "_________   _________   _________");
+	mvwprintw(menuwin, height / 10 + 1, width / 2 - 20, "/\\   _____\\ /\\   _____\\ /\\   _____\\");
+	mvwprintw(menuwin, height / 10 + 2, width / 2 - 20, "\\ \\  \\____/ \\ \\  \\____/_\\ \\  \\____/");
+	mvwprintw(menuwin, height / 10 + 3, width / 2 - 19, "\\ \\  \\      \\ \\______  \\\\ \\  \\");
+	mvwprintw(menuwin, height / 10 + 4, width / 2 - 18, "\\ \\  \\______\\_ _____\\  \\\\ \\  \\______");
+	mvwprintw(menuwin, height / 10 + 5, width / 2 - 17, "\\ \\________\\ /\\________\\\\ \\________\\");
+	mvwprintw(menuwin, height / 10 + 6, width / 2 - 16, "\\/________/ \\/________/ \\/________/");
+	mvwprintw(menuwin, height / 10 + 9, width / 2 - 9, "Cine Stie Castiga!");
+	wattroff(menuwin, A_BOLD);
 	wattroff(menuwin, COLOR_PAIR(1));
+}
+
+void printBorder (WINDOW *menuwin) {
+	wattron(menuwin, COLOR_PAIR(5));
+	wattron(menuwin, A_BOLD);
+	box(menuwin, 0, 0);
+	wattroff(menuwin, A_BOLD);
+	wattroff(menuwin, COLOR_PAIR(5));
 }
 
 void initMenu (char *qFileName) {
@@ -270,9 +342,8 @@ void initMenu (char *qFileName) {
 	init_pair(2, COLOR_GREEN, COLOR_BLACK);
 	init_pair(3, COLOR_RED, COLOR_BLACK);
 	init_pair(4, COLOR_WHITE, COLOR_BLACK);
+	init_pair(5, COLOR_WHITE, COLOR_CYAN);
 
-	time_t mytime;
-	char *time_str;
 	Game game;
 
 	int height, width;
@@ -283,34 +354,30 @@ void initMenu (char *qFileName) {
 
 	keypad(menuwin, true);
 	
-
-	char button[3][12];
-	strcpy(button[0], "New Game");
-	strcpy(button[1], "Resume Game");
-	strcpy(button[2], "Quit");
+	char *button[] = { "New Game", "Resume Game", "Quit"};
 
 	int curent = 0;
 	int keyInput;
 	int i;
 	while (1) {
 		
-		box(menuwin, 0, 0);
 		printTitle (menuwin, height, width);
+		printBorder(menuwin);
 
-		mytime = time(NULL);
-		time_str = ctime(&mytime);
-		time_str[strlen(time_str) - 1] = '\0';
-		mvwprintw(menuwin, 0, width - strlen(time_str) - 6, "[ %s ]", time_str);
+		printTime(menuwin, height, width);
 
-
-
+		wattron(menuwin, A_BOLD);
 		for (i = 0; i < 3; ++i) {
 			if (i == curent) {
+				
 				wattron(menuwin, A_REVERSE);
 			}
-			mvwprintw(menuwin, height * 3 / 5 + i + 1, width / 2 - strlen(button[i]) / 2, "%s", button[i]);
+			mvwprintw(menuwin, height * 2 / 3 + i + 1, width / 2 - strlen(button[i]) / 2, "%s", button[i]);
 			wattroff(menuwin, A_REVERSE);
+			
 		}
+		wattroff(menuwin, A_BOLD);
+
 		wrefresh(menuwin);
 	
 		keyInput = wgetch(menuwin);

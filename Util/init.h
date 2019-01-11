@@ -16,8 +16,11 @@ typedef struct {
 	int rightAnsw;
 } Game;
 
-void refreshGameScreen (WINDOW *, int height, int width, question *, char option[][10], Game *, int *, int col);
+void printAnswCol (int keyInput, WINDOW *, int height, int width, question *, Game *, int col);
+void refreshGameScreen (WINDOW *, int height, int width, question *, char *option[], Game *, int *, int col);
 void printQuestion (int curQuest, int height, int width, WINDOW *, question *, int x);
+void printTime (WINDOW *, int height, int width);
+void printBorder(WINDOW *);
 void loadQuestion (int nr, question *, FILE *);
 void freeMem (question *, int nr);
 void startGame (char *, int height, int width, WINDOW *, Game *);
