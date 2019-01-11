@@ -25,6 +25,6 @@ void loadQuestion (int nr, question *, FILE *);
 void freeMem (question *, int nr);
 void startGame (char *, int height, int width, WINDOW *, Game *);
 void printTitle (WINDOW *, int height, int width);
-void initMenu (char *);
+void initMenu (char *argv[]);
 
 #endif

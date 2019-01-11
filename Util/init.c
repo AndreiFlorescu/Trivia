@@ -7,6 +7,8 @@
 
 #include "init.h"
 
+#define noButMenu 4
+
 void printQuestion (int curQuest, int height, int width, WINDOW *menuwin, question *round, int secChoice) {
 	wattron(menuwin, A_BOLD);
 	mvwprintw(menuwin, height / 2 - 4, width / 2 - strlen(round[curQuest].quest) / 2 - 1, "%s", round[curQuest].quest);
@@ -85,18 +87,20 @@ void refreshGameScreen (WINDOW *menuwin, int height, int width, question *round,
 	int i;
 
 	wclear(menuwin);
+	getmaxyx(menuwin, height, width);
 
 	printBorder(menuwin);	
 
 	// Instructiuni de utilizare
 	wattron(menuwin, COLOR_PAIR(5));
 	for (i = 1; i < width - 1; ++i) {
-		mvwprintw(menuwin, height - 6, i, "-");
+		mvwprintw(menuwin, height - 7, i, "-");
 	}
 	wattroff(menuwin, COLOR_PAIR(5));
 
-	mvwprintw(menuwin, height - 4, width / 2 - 37, "Pentru a selecta un raspuns apasati tasta a, b, c sau d");
-	mvwprintw(menuwin, height - 3, width / 2 - 37, "Pentru a selecta o varianta ajutatoare folositi sagetile si apasati ENTER");
+	mvwprintw(menuwin, height - 5, width / 2 - 37, "Pentru a selecta un raspuns apasati tasta a, b, c sau d");
+	mvwprintw(menuwin, height - 4, width / 2 - 37, "Pentru a selecta o varianta ajutatoare folositi sagetile si apasati ENTER");
+	mvwprintw(menuwin, height - 3, width / 2 - 37, "Pentru a va intoarce in meniu apasati tasta q");
 
 	// Printam scorul
 	if (game->score > 99 || game->score < -9) {
@@ -119,10 +123,10 @@ void refreshGameScreen (WINDOW *menuwin, int height, int width, question *round,
 	// Pritam timpul
 	printTime(menuwin, height, width);
 
-	if (game->help[0] == 1) {
+	if (game->help[0] >= 1) {
 		*curent = 1;
 	}
-	if (game->help[1] == 1) {
+	if (game->help[1] >= 1) {
 		*curent = 0;
 	}
 
@@ -216,7 +220,7 @@ void startGame (char *qFileName, int height, int width, WINDOW *menuwin, Game *g
 						wclear(menuwin);
 					}
 					game->help[curent] = game->quest + 1;
-				
+					break;
 				default:
 					break;
 			}
@@ -255,7 +259,10 @@ void startGame (char *qFileName, int height, int width, WINDOW *menuwin, Game *g
 			}
 
 			wrefresh(menuwin);
+
+			keypad(menuwin, FALSE);
 			sleep(2.5);
+			keypad(menuwin, TRUE);
 
 			game->quest++;
 			wclear(menuwin);
@@ -332,7 +339,7 @@ void printBorder (WINDOW *menuwin) {
 	wattroff(menuwin, COLOR_PAIR(5));
 }
 
-void initMenu (char *qFileName) {
+void initMenu (char *argv[]) {
 	initscr();
 	noecho();
 	curs_set(0);
@@ -345,6 +352,7 @@ void initMenu (char *qFileName) {
 	init_pair(5, COLOR_WHITE, COLOR_CYAN);
 
 	Game game;
+	game.state = 0;
 
 	int height, width;
 	getmaxyx(stdscr, height, width);
@@ -352,22 +360,25 @@ void initMenu (char *qFileName) {
 	WINDOW *menuwin = newwin (height, width, 0, 0);
 	refresh();
 
-	keypad(menuwin, true);
-	
-	char *button[] = { "New Game", "Resume Game", "Quit"};
+	keypad(menuwin, TRUE);
+
+	char *button[] = { "New Game", "Resume Game", "Quit", "Resume last session"};
+
+	FILE *save_file;
 
 	int curent = 0;
 	int keyInput;
 	int i;
 	while (1) {
-		
+		wclear(menuwin);
+		getmaxyx(menuwin, height, width);
 		printTitle (menuwin, height, width);
 		printBorder(menuwin);
 
 		printTime(menuwin, height, width);
 
 		wattron(menuwin, A_BOLD);
-		for (i = 0; i < 3; ++i) {
+		for (i = 0; i < noButMenu; ++i) {
 			if (i == curent) {
 				
 				wattron(menuwin, A_REVERSE);
@@ -392,26 +403,45 @@ void initMenu (char *qFileName) {
 			case 10:
 				switch (curent) {
 				case 0:
-					
+					gameOn = 1;
 					game.quest = 0;
 					game.score = 0;
 					game.help[0] = 0;
 					game.help[1] = 0;
 					game.fiftyVar = -1;
 					game.state = 1;
-					game.rightAnsw= 0;
-					startGame(qFileName, height, width, menuwin, &game);
+					game.rightAnsw = 0;
+					startGame(argv[1], height, width, menuwin, &game);
 					break;
 				case 1:
-					if (game.state == 0) {
-						break;
-					} else {
-						startGame(qFileName, height, width, menuwin, &game);
+					if (game.state == 1) {
+						startGame(argv[1], height, width, menuwin, &game);
 					}
 					break;
-				case 2:	
+				case 2:
+					save_file = fopen(argv[2], "w");
+					fprintf(save_file, "%d\n%d\n%d\n%d\n%d\n%d\n%d\n", 	game.quest,	
+																		game.score, 
+																		game.help[0],
+																		game.help[1],
+																		game.fiftyVar,
+																		game.state,
+																		game.rightAnsw);
 					endwin();
 					return;
+				case 3:
+					save_file = fopen(argv[2], "r");
+					fscanf(save_file, "%d\n%d\n%d\n%d\n%d\n%d\n%d\n", 	&game.quest,	
+																		&game.score, 
+																		&game.help[0],
+																		&game.help[1],
+																		&game.fiftyVar,
+																		&game.state,
+																		&game.rightAnsw);
+					if (game.state == 1) {
+						startGame(argv[1], height, width, menuwin, &game);
+					}
+					break;
 			default:
 				break;
 		}
@@ -422,8 +452,9 @@ void initMenu (char *qFileName) {
 		if (curent < 0) {
 			curent = 0;
 		}
-		if (curent > 2) {
-			curent = 2;
+		if (curent > noButMenu - 1) {
+			curent = noButMenu - 1;
 		}
 	}
+	fclose(save_file);
 }

@@ -1,4 +1,4 @@
-6
+10
 Care este cea mai mare cascada din Romania?
 Cascada Cailor
 Cascada Urlatoare
@@ -29,9 +29,33 @@ In ce an a ajuns primul om pe luna?
 1969
 1972
 2
-Intre ce ani a avut loc Razboil de Independenta al Romaniei
+Intre ce ani a avut loc Razboiul de Independenta al Romaniei
 1877-1878
 1875-1876
 1879-1880
 1873-1874
 0
+Cum se numesc mieii pana la un an?
+Carlani
+Marlani
+Mielusei
+Malaci
+0
+Care rege a avut domnia cea mai lunga?
+Mihai I
+Carol al II-lea
+Carol I
+Alexandru Ioan Cuza
+2
+Care este cel mai mare vulcan din Europa?
+Vezuviu
+Etna
+Stromboli
+Methana
+1
+Care este cea mai scazuta temeperatura inregistrata pe Terra (in grade celsius)?
+-58
+-63.8
+-89.2
+-93.2
+2
