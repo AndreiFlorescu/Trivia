@@ -1,12 +1,14 @@
 #ifndef INIT
 #define INIT
 
+// Structura pentru intrebari
 typedef struct {
 	char *quest;
 	char answ[4][101];
 	int corAnsw;
 } question;
 
+// Structura pentru datele jocului
 typedef struct {
 	int quest;
 	int score;

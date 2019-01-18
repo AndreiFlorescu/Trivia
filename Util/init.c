@@ -9,6 +9,7 @@
 
 #define noButMenu 4
 
+// Functia pentru printarea intrebarilor
 void printQuestion (int curQuest, int height, int width, WINDOW *menuwin, question *round, int secChoice) {
 	wattron(menuwin, A_BOLD);
 	mvwprintw(menuwin, height / 2 - 4, width / 2 - strlen(round[curQuest].quest) / 2 - 1, "%s", round[curQuest].quest);
@@ -40,6 +41,7 @@ void printQuestion (int curQuest, int height, int width, WINDOW *menuwin, questi
 	}
 }
 
+// Functia pentru incarcarea intrebarilor
 void loadQuestion (int nr, question *round, FILE *q_file) {
 	int i;
 	for (i = 0; i < nr; ++i) {
@@ -61,6 +63,7 @@ void loadQuestion (int nr, question *round, FILE *q_file) {
 	return;
 }
 
+// Functia pentru eliberarea memoriei
 void freeMem (question *round, int nr) {
 	int i;
 	for (i = 0; i < nr; ++i) {
@@ -69,6 +72,7 @@ void freeMem (question *round, int nr) {
 	free(round);
 }
 
+// Functia pentru printarea timpului
 void printTime (WINDOW *menuwin, int height, int width) {
 	time_t mytime;
 	char *time_str;
@@ -83,6 +87,7 @@ void printTime (WINDOW *menuwin, int height, int width) {
 	wattroff(menuwin, COLOR_PAIR(5));
 }
 
+// Functia pentru regenerarea ecranului in timpul jocului
 void refreshGameScreen (WINDOW *menuwin, int height, int width, question *round, char *option[], Game *game, int *curent, int col) {
 	int i;
 
@@ -145,11 +150,13 @@ void refreshGameScreen (WINDOW *menuwin, int height, int width, question *round,
 	wattroff(menuwin, COLOR_PAIR(5));
 	wattroff(menuwin, A_BOLD);
 
+	// Printam intrebarile
 	printQuestion(game->quest, height, width, menuwin, round, game->fiftyVar);
 
 	wrefresh(menuwin);
 }
 
+// Functia pentru printarea raspunsurilor cu culori
 void printAnswCol (int keyInput, WINDOW *menuwin, int height, int width, question *round, Game *game, int col) {
 	wattron(menuwin, COLOR_PAIR(col));
 	wattron(menuwin, A_BOLD);
@@ -315,6 +322,7 @@ void startGame (char *qFileName, int height, int width, WINDOW *menuwin, Game *g
 	return;
 }
 
+// Functia pentru printarea titlului si a ator detalii
 void printTitle (WINDOW *menuwin, int height, int width) {
 	wattron(menuwin, COLOR_PAIR(1));
 	wattron(menuwin, A_BOLD);
@@ -331,6 +339,7 @@ void printTitle (WINDOW *menuwin, int height, int width) {
 	wattroff(menuwin, COLOR_PAIR(1));
 }
 
+// Functia pentru printarea marginii
 void printBorder (WINDOW *menuwin) {
 	wattron(menuwin, COLOR_PAIR(5));
 	wattron(menuwin, A_BOLD);
@@ -340,6 +349,7 @@ void printBorder (WINDOW *menuwin) {
 }
 
 void initMenu (char *argv[]) {
+// Initializam ncurses
 	initscr();
 	noecho();
 	curs_set(0);
@@ -369,18 +379,21 @@ void initMenu (char *argv[]) {
 	int curent = 0;
 	int keyInput;
 	int i;
+
+// Bucla care genereaza si altereaza meniul
 	while (1) {
 		wclear(menuwin);
+		// Verificam daca marimea ecranului a fost schimbata
 		getmaxyx(menuwin, height, width);
 		printTitle (menuwin, height, width);
 		printBorder(menuwin);
 
 		printTime(menuwin, height, width);
 
+		// afisam butoanele
 		wattron(menuwin, A_BOLD);
 		for (i = 0; i < noButMenu; ++i) {
 			if (i == curent) {
-				
 				wattron(menuwin, A_REVERSE);
 			}
 			mvwprintw(menuwin, height * 2 / 3 + i + 1, width / 2 - strlen(button[i]) / 2, "%s", button[i]);
@@ -390,7 +403,8 @@ void initMenu (char *argv[]) {
 		wattroff(menuwin, A_BOLD);
 
 		wrefresh(menuwin);
-	
+
+		// Asteptam input de la jucator		
 		keyInput = wgetch(menuwin);
 
 		switch (keyInput) {
@@ -402,8 +416,8 @@ void initMenu (char *argv[]) {
 				break;
 			case 10:
 				switch (curent) {
+				// Apasarea butonului New Game
 				case 0:
-					gameOn = 1;
 					game.quest = 0;
 					game.score = 0;
 					game.help[0] = 0;
@@ -413,12 +427,16 @@ void initMenu (char *argv[]) {
 					game.rightAnsw = 0;
 					startGame(argv[1], height, width, menuwin, &game);
 					break;
+				// Apasarea butonului Resume Game
 				case 1:
+					// Incepem doar daca s-a inceput deja un joc in aceasta sesiune
 					if (game.state == 1) {
 						startGame(argv[1], height, width, menuwin, &game);
 					}
 					break;
+				// Apasarea butonului Quit	
 				case 2:
+					// Salvam datele despre aceasta sesiune
 					save_file = fopen(argv[2], "w");
 					fprintf(save_file, "%d\n%d\n%d\n%d\n%d\n%d\n%d\n", 	game.quest,	
 																		game.score, 
@@ -429,7 +447,9 @@ void initMenu (char *argv[]) {
 																		game.rightAnsw);
 					endwin();
 					return;
+				// Apasarea butonului Resume last session
 				case 3:
+					// Incarca datele din fisierul de save
 					save_file = fopen(argv[2], "r");
 					fscanf(save_file, "%d\n%d\n%d\n%d\n%d\n%d\n%d\n", 	&game.quest,	
 																		&game.score, 
@@ -438,13 +458,14 @@ void initMenu (char *argv[]) {
 																		&game.fiftyVar,
 																		&game.state,
 																		&game.rightAnsw);
+					// Daca exista un joc inceput intr-o sesiune trecuta il incarca
 					if (game.state == 1) {
 						startGame(argv[1], height, width, menuwin, &game);
 					}
 					break;
-			default:
-				break;
-		}
+				default:
+					break;
+			}
 			default:
 				break;
 		}
